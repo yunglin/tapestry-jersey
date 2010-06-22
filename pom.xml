@@ -7,9 +7,9 @@
   <description>Jersey/JAX-RS Tapestry5 Integration</description>
 
   <scm>
-    <connection>scm:git:git@github.com:tobrien/git-demo.git</connection>
-    <url>scm:git:git@github.com:tobrien/git-demo.git</url>
-    <developerConnection>scm:git:git@github.com:tobrien/git-demo.git</developerConnection>
+    <connection>scm:git:git@github.com:yunglin/tapestry-jersey.git</connection>
+    <url>scm:git:git@github.com:yunglin/tapestry-jersey.git</url>
+    <developerConnection>scm:git:git@github.com:yunglin/tapestry-jersey.git</developerConnection>
   </scm>
 
   <developers>
