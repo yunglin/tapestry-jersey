@@ -64,7 +64,7 @@ public class JerseyModule {
      */
     @Scope(ScopeConstants.DEFAULT)
     @EagerLoad
-    public static Application buildApplication(Collection<Object> configurations) {
+    public static Application buildJerseyRootResources(Collection<Object> configurations) {
         return new TapestryEnabledApplication(configurations);
     }
 
@@ -72,7 +72,7 @@ public class JerseyModule {
     @EagerLoad
     public static HttpServletRequestFilter buildJerseyHttpServletRequestFilter(
             @Inject @Symbol(JerseySymbols.REQUEST_PATH_PREFIX) String pathPrefix,
-            Application jaxwsApplication,
+            @Service("JerseyRootResources") Application jaxwsApplication,
             ApplicationGlobals applicationGlobal) throws ServletException {
         
         ServletContainer jaxwsContainer = new ServletContainer(jaxwsApplication);
