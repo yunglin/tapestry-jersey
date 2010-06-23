@@ -21,13 +21,13 @@ import org.apache.tapestry5.ioc.annotations.SubModule;
 
 import com.bluetangstudio.shared.jersey.services.JerseyModule;
 import com.bluetangstudio.shared.jersey.test.services.rest.HelloWorld;
-import com.bluetangstudio.shared.jersey.test.services.rest.HelloWorldResourceImpl;
+import com.bluetangstudio.shared.jersey.test.services.rest.HelloWorldImpl;
 
 @SubModule(JerseyModule.class)
 public class AppModule {
     
     public static void bind(ServiceBinder binder) {
-        binder.bind(HelloWorld.class, HelloWorldResourceImpl.class);
+        binder.bind(HelloWorld.class, HelloWorldImpl.class);
     }
     
     public static void contributeApplication(Configuration<Object> configuration, ObjectLocator objectLocator) {
