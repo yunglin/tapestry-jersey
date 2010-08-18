@@ -30,7 +30,7 @@ public class AppModule {
         binder.bind(HelloWorld.class, HelloWorldImpl.class);
     }
     
-    public static void contributeApplication(Configuration<Object> configuration, ObjectLocator objectLocator) {
+    public static void contributeJerseyRootResources(Configuration<Object> configuration, ObjectLocator objectLocator) {
         configuration.add(objectLocator.getService(HelloWorld.class));
     }
 

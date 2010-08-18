@@ -55,7 +55,7 @@ public class JerseyRequestFilter implements HttpServletRequestFilter {
     public boolean service(HttpServletRequest request, HttpServletResponse response, HttpServletRequestHandler handler)
             throws IOException {
 
-        if (!request.getRequestURI().startsWith(_pathPrefix)) {
+        if (!request.getServletPath().startsWith(_pathPrefix)) {
             return handler.service(request, response);
         }
 
