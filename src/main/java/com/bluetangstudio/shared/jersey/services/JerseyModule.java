@@ -23,16 +23,20 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 
+import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.Service;
 import org.apache.tapestry5.ioc.MappedConfiguration;
+import org.apache.tapestry5.ioc.ObjectLocator;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ScopeConstants;
 import org.apache.tapestry5.ioc.annotations.EagerLoad;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.Scope;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.ApplicationGlobals;
 import org.apache.tapestry5.services.HttpServletRequestFilter;
+import org.apache.tapestry5.services.SessionPersistedObjectAnalyzer;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
@@ -48,13 +52,14 @@ public class JerseyModule {
     }
 
     /**
-     * Added {@link JerseyRequestFilter} to the very beginning of servlet filter chain. 
+     * Added {@link JerseyRequestFilter} to the very beginning of servlet filter chain.
+     * 
      * @param configuration
      * @param jerseyFilter
      */
     public void contributeHttpServletRequestHandler(OrderedConfiguration<HttpServletRequestFilter> configuration,
             @Service("JerseyHttpServletRequestFilter") HttpServletRequestFilter jerseyFilter) {
-        configuration.add("JerseyFilter", jerseyFilter, "before:GZIP");
+        configuration.add("JerseyFilter", jerseyFilter, "after:StoreIntoGlobals", "before:EndOfRequest", "before:GZIP");
     }
 
     /**
@@ -71,38 +76,39 @@ public class JerseyModule {
     @Scope(ScopeConstants.DEFAULT)
     @EagerLoad
     public static HttpServletRequestFilter buildJerseyHttpServletRequestFilter(
-            @Inject @Symbol(JerseySymbols.REQUEST_PATH_PREFIX) String pathPrefix,
-            @Service("JerseyRootResources") Application jaxwsApplication,
-            ApplicationGlobals applicationGlobal) throws ServletException {
-        
+            @Service("JerseyRootResources") Application jaxwsApplication, ApplicationGlobals applicationGlobal,
+            ObjectLocator objectLocator) throws ServletException {
+
         ServletContainer jaxwsContainer = new ServletContainer(jaxwsApplication);
         final ServletContext servletContext = applicationGlobal.getServletContext();
         final Hashtable<String, String> params = new Hashtable<String, String>();
         params.put("javax.ws.rs.Application", TapestryEnabledApplication.class.getName());
 
         jaxwsContainer.init(new FilterConfig() {
-            
+
             @Override
             public ServletContext getServletContext() {
                 return servletContext;
             }
-            
+
             @Override
             public Enumeration<?> getInitParameterNames() {
                 return params.elements();
             }
-            
+
             @Override
             public String getInitParameter(String name) {
                 return params.get(name);
             }
-            
+
             @Override
             public String getFilterName() {
                 return "JerseyHttpServletRequestFilter";
             }
         });
-        return new JerseyRequestFilter(pathPrefix, jaxwsContainer);
+        JerseyRequestFilter ret = objectLocator.autobuild(JerseyRequestFilter.class);
+        ret.setServletContainer(jaxwsContainer);
+        return ret;
     }
 
 }

@@ -23,8 +23,18 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.tapestry5.SymbolConstants;
+import org.apache.tapestry5.internal.services.RequestImpl;
+import org.apache.tapestry5.internal.services.ResponseImpl;
+import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Primary;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.HttpServletRequestFilter;
 import org.apache.tapestry5.services.HttpServletRequestHandler;
+import org.apache.tapestry5.services.Request;
+import org.apache.tapestry5.services.RequestGlobals;
+import org.apache.tapestry5.services.Response;
+import org.apache.tapestry5.services.SessionPersistedObjectAnalyzer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,12 +53,22 @@ public class JerseyRequestFilter implements HttpServletRequestFilter {
 
     private ServletContainer _jaxwsContainer;
 
+    @Inject
+    private RequestGlobals _requestGlobals;
+    
+    @Inject
+    @Symbol(JerseySymbols.REQUEST_PATH_PREFIX)
     private String _pathPrefix;
+    
+    @Inject
+    @Primary
+    private SessionPersistedObjectAnalyzer analyzer;
+    
+    @Symbol(SymbolConstants.CHARSET)
+    private String applicationCharset;
 
-    public JerseyRequestFilter(String pathPrefix, ServletContainer container) {
-        _pathPrefix = pathPrefix;
-        _jaxwsContainer = container;
-
+    public void setServletContainer(ServletContainer jaxwsContainer) {
+        _jaxwsContainer = jaxwsContainer;
     }
 
     @Override
@@ -60,6 +80,12 @@ public class JerseyRequestFilter implements HttpServletRequestFilter {
         }
 
         try {
+            
+            // made the request/response available in jersey managed services. 
+            Request t5request = new RequestImpl(request, applicationCharset, analyzer);
+            Response t5response = new ResponseImpl(response);
+            _requestGlobals.storeRequestResponse(t5request, t5response);
+            
             _jaxwsContainer.doFilter(request, response, END_OF_CHAIN);
             return true;
         }
@@ -76,5 +102,6 @@ public class JerseyRequestFilter implements HttpServletRequestFilter {
 
         }
     }
+
 
 }
