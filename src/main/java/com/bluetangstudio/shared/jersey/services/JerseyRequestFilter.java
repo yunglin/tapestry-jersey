@@ -83,7 +83,7 @@ public class JerseyRequestFilter implements HttpServletRequestFilter {
             
             // made the request/response available in jersey managed services. 
             Request t5request = new RequestImpl(request, applicationCharset, analyzer);
-            Response t5response = new ResponseImpl(response);
+            Response t5response = new ResponseImpl(request, response);
             _requestGlobals.storeRequestResponse(t5request, t5response);
             
             _jaxwsContainer.doFilter(request, response, END_OF_CHAIN);
