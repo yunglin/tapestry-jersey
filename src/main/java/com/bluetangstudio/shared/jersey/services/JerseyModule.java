@@ -14,33 +14,33 @@
 
 package com.bluetangstudio.shared.jersey.services;
 
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
 
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.ws.rs.core.Application;
-
-import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.Service;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ObjectLocator;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ScopeConstants;
 import org.apache.tapestry5.ioc.annotations.EagerLoad;
-import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.Scope;
-import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.ApplicationGlobals;
 import org.apache.tapestry5.services.HttpServletRequestFilter;
-import org.apache.tapestry5.services.SessionPersistedObjectAnalyzer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.spi.container.servlet.ServletContainer;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.ws.rs.core.Application;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 
 public class JerseyModule {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JerseyModule.class);
 
     /**
      * Contribute the default value of {@link JerseySymbols.REQUEST_PATH_PREFIX} to Tapestry.
@@ -70,7 +70,19 @@ public class JerseyModule {
     @Scope(ScopeConstants.DEFAULT)
     @EagerLoad
     public static Application buildJerseyRootResources(Collection<Object> configurations) {
-        return new TapestryEnabledApplication(configurations);
+        List singletons = new LinkedList();
+        List classes = new LinkedList();
+
+        for(Object provider: configurations) {
+            if (provider instanceof Class<?>) {
+                classes.add(provider);
+            }else {
+                singletons.add(provider);
+            }
+        }
+
+        LOG.info("Start Jersey Application with singletons providers:({})\n and classes providers:({})", singletons, classes);
+        return new TapestryEnabledApplication(singletons, classes);
     }
 
     @Scope(ScopeConstants.DEFAULT)

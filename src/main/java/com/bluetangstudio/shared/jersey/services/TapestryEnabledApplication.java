@@ -15,7 +15,6 @@
 package com.bluetangstudio.shared.jersey.services;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,7 +27,9 @@ import javax.ws.rs.core.Application;
 public class TapestryEnabledApplication extends Application {
 
     private Set<Object> _singletons;
-    
+
+    private Set<Class<?>> _classes;
+
     /**
      * 
      * @param singletons collection of Tapestry managed services and/or any thread-safe services.
@@ -36,12 +37,19 @@ public class TapestryEnabledApplication extends Application {
      * collection too.
      *
      */
-    public TapestryEnabledApplication(Collection<?> singletons) {
-        _singletons = Collections.unmodifiableSet(new HashSet<Object>(singletons));
+    public TapestryEnabledApplication(Collection<?> singletons, Collection<Class<?>> classes) {
+        _singletons = new HashSet<Object>(singletons);
+        _classes = new HashSet<Class<?>>(classes);
     }
-    
+
+    @Override
     public Set<Object> getSingletons() {
         return _singletons;
+    }
+
+    @Override
+    public Set<java.lang.Class<?>> getClasses() {
+        return _classes;
     }
         
 }
