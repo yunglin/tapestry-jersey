@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.bluetangstudio.common</groupId>
     <artifactId>masterpom</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
   
   <description>Jersey/JAX-RS Tapestry5 Integration</description>
